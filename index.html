@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0d12">
+<meta name="description" content="像素工坊 · 一组打开即玩的浏览器小游戏">
+<title>像素工坊 · 游戏大厅</title>
+<style>
+  :root{
+    --bg:#0b0d12;
+    --bg-soft:#11141c;
+    --panel:#171b25;
+    --border:rgba(255,255,255,.08);
+    --text:#dfe6f2;
+    --muted:#8b95a8;
+    --accent:#5ee0ff;
+    --radius:16px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    min-height:100svh;display:flex;flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+  button,input{font-family:inherit}
+
+  /* ===== 顶栏 ===== */
+  .topbar{
+    position:sticky;top:0;z-index:100;
+    height:60px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 clamp(16px,4vw,40px);
+    background:rgba(11,13,18,.8);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.02em}
+  .brand-dot{
+    width:14px;height:14px;border-radius:4px;
+    background:linear-gradient(135deg,#5ee0ff,#ffd25e);
+    box-shadow:0 0 14px rgba(94,224,255,.55);
+  }
+  .top-actions{display:flex;align-items:center;gap:8px}
+  .gh-link{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:8px 14px;border-radius:10px;font-size:13.5px;font-weight:600;
+    color:var(--muted);border:1px solid var(--border);
+    background:rgba(255,255,255,.03);transition:all .16s;
+  }
+  .gh-link:hover{color:var(--text);border-color:rgba(94,224,255,.35);background:rgba(94,224,255,.08)}
+  .gh-link svg{width:16px;height:16px;fill:currentColor}
+
+  /* ===== Hero ===== */
+  .hero{
+    position:relative;overflow:hidden;
+    padding:clamp(52px,9vw,96px) clamp(20px,5vw,48px) clamp(36px,6vw,64px);
+  }
+  .hero::before{
+    content:"";position:absolute;z-index:0;
+    width:min(640px,120vw);height:min(640px,120vw);
+    top:-40%;right:-20%;border-radius:50%;
+    background:radial-gradient(circle,rgba(94,224,255,.12),transparent 68%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative;z-index:1;max-width:720px}
+  .eyebrow{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;
+    color:var(--accent);text-transform:uppercase;
+    padding:5px 12px;border-radius:99px;margin-bottom:18px;
+    background:rgba(94,224,255,.09);border:1px solid rgba(94,224,255,.22);
+  }
+  .hero h1{
+    font-size:clamp(30px,6.2vw,52px);line-height:1.14;
+    letter-spacing:-.022em;font-weight:800;
+  }
+  .grad{
+    background:linear-gradient(100deg,#5ee0ff,#ffd25e 55%,#ff4d8d);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{margin-top:16px;color:var(--muted);font-size:clamp(14.5px,2.2vw,16.5px);max-width:52ch}
+
+  /* ===== 工具栏 ===== */
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    padding:0 clamp(20px,5vw,48px);
+    margin-bottom:22px;
+  }
+  .search-wrap{position:relative;flex:1 1 240px;max-width:360px}
+  .search-wrap svg{
+    position:absolute;left:13px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;
+    pointer-events:none;
+  }
+  #search{
+    width:100%;padding:11px 14px 11px 38px;border-radius:11px;
+    background:var(--bg-soft);border:1px solid var(--border);
+    color:var(--text);font-size:14px;outline:none;
+    transition:border-color .16s,background .16s;
+  }
+  #search::placeholder{color:#5a6373}
+  #search:focus{border-color:rgba(94,224,255,.45);background:#141926}
+
+  /* ===== 游戏网格 ===== */
+  main{flex:1;padding:0 clamp(20px,5vw,48px) clamp(56px,8vw,88px)}
+  .grid{
+    display:grid;gap:16px;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    max-width:1180px;
+  }
+
+  .card{
+    display:flex;flex-direction:column;
+    border-radius:var(--radius);overflow:hidden;
+    background:linear-gradient(180deg,var(--panel),var(--bg-soft));
+    border:1px solid var(--border);
+    transition:transform .2s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s;
+    will-change:transform;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:color-mix(in srgb, var(--accent) 45%, transparent);
+    box-shadow:0 16px 40px rgba(0,0,0,.45),0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .card:active{transform:translateY(-1px) scale(.99)}
+
+  .thumb{
+    position:relative;aspect-ratio:16/9;overflow:hidden;
+    background:#0a0e16;border-bottom:1px solid var(--border);
+  }
+  .thumb svg{width:100%;height:100%;display:block;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .card:hover .thumb svg{transform:scale(1.055)}
+
+  .badge{
+    position:absolute;top:10px;right:10px;z-index:2;
+    padding:3px 9px;border-radius:99px;
+    font-size:10.5px;font-weight:800;letter-spacing:.08em;
+    background:var(--accent);color:#04121a;
+    box-shadow:0 4px 14px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+
+  .body{padding:15px 17px 17px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .head h3{font-size:16px;font-weight:700;letter-spacing:-.005em}
+  .arrow{
+    font-size:16px;color:var(--muted);flex:0 0 auto;
+    transition:transform .2s,color .2s;
+  }
+  .card:hover .arrow{transform:translateX(3px);color:var(--accent)}
+  .body p{font-size:13.5px;color:var(--muted);line-height:1.55;flex:1}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .tags span{
+    font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;
+    color:#9aa5b8;background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.06);
+  }
+
+  .empty{
+    grid-column:1/-1;text-align:center;padding:64px 20px;
+    color:var(--muted);font-size:14.5px;
+  }
+
+  /* ===== 页脚 ===== */
+  footer{
+    border-top:1px solid var(--border);
+    padding:26px clamp(20px,5vw,48px);
+    display:flex;flex-wrap:wrap;gap:12px;
+    align-items:center;justify-content:space-between;
+    font-size:13px;color:var(--muted);
+  }
+  footer a:hover{color:var(--accent)}
+
+  @media (max-width:520px){
+    .hero{padding-top:40px}
+    .grid{grid-template-columns:1fr;gap:14px}
+    footer{justify-content:center;text-align:center}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="./"><span class="brand-dot"></span>像素工坊</a>
+  <div class="top-actions">
+    <a class="gh-link" id="ghLink" href="#" target="_blank" rel="noopener" hidden>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">HTML5 · 无需下载 · 手机可玩</span>
+    <h1>打开网页，<br><span class="grad">直接开始玩</span></h1>
+    <p>一组纯前端小游戏。没有注册、没有安装，点开卡片就进入游戏。</p>
+  </div>
+</section>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="search" type="search" placeholder="搜索游戏或标签…" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+
+<main>
+  <div class="grid" id="games"></div>
+</main>
+
+<footer>
+  <span>© <span id="year"></span> 像素工坊 · 纯前端实验</span>
+  <span><a href="./">首页</a> · <a id="footerRepo" href="#" target="_blank" rel="noopener" hidden>源码</a></span>
+</footer>
+
+<script>
+/* ============================================================
+   游戏清单 —— 加新游戏只改这里
+   url 用相对路径，结尾带斜杠，会加载该目录下的 index.html
+   ============================================================ */
+const GAMES = [
+  {
+    title: '像素沙盒',
+    desc: '撒沙、倒水、点火的实时物理沙盒，十种元素自由混合。',
+    tags: ['物理', '创造', '沙盒'],
+    url: './sandbox/',
+    accent: '#5ee0ff',
+    badge: '',
+    preview: `
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <pattern id="sb-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M10 0H0V10" fill="none" stroke="rgba(94,224,255,.10)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="320" height="180" fill="#0a0e16"/>
+        <rect width="320" height="180" fill="url(#sb-grid)"/>
+        <rect y="132" width="320" height="48" fill="#0d1119"/>
+        <g fill="#e0b96e">
+          <rect x="42" y="142" width="76" height="10"/>
+          <rect x="52" y="132" width="56" height="10"/>
+          <rect x="62" y="122" width="36" height="10"/>
+          <rect x="72" y="112" width="16" height="10"/>
+        </g>
+        <g fill="#2f78de" opacity=".9">
+          <rect x="176" y="152" width="104" height="12"/>
+          <rect x="188" y="142" width="80" height="10"/>
+        </g>
+        <g fill="#ff8c1e">
+          <rect x="236" y="118" width="9" height="26"/>
+          <rect x="247" y="128" width="8" height="16"/>
+        </g>
+        <rect x="239" y="124" width="6" height="12" fill="#ffd25e"/>
+      </svg>`
+  },
+  {
+    title: '霓虹跑酷 3D',
+    desc: '三车道无限跑酷。左右切道，上滑跳跃，下滑滑铲，收集能量块。',
+    tags: ['3D', '跑酷', '街机'],
+    url: './runner/',
+    accent: '#ff4d8d',
+    badge: 'NEW',
+    preview: `
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="rn-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0a1420"/>
+            <stop offset="1" stop-color="#0d1119"/>
+          </linearGradient>
+          <linearGradient id="rn-road" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#121826"/>
+            <stop offset="1" stop-color="#1b2435"/>
+          </linearGradient>
+        </defs>
+        <rect width="320" height="180" fill="url(#rn-sky)"/>
+        <polygon points="112,180 208,180 176,64 144,64" fill="url(#rn-road)"/>
+        <polygon points="130,180 134,180 155,64 153,64" fill="#1f8fc4" opacity=".75"/>
+        <polygon points="186,180 190,180 167,64 165,64" fill="#1f8fc4" opacity=".75"/>
+        <polygon points="112,180 117,180 152,64 150,64" fill="#5ee0ff" opacity=".45"/>
+        <polygon points="203,180 208,180 170,64 168,64" fill="#5ee0ff" opacity=".45"/>
+        <rect x="146" y="116" width="24" height="22" fill="#ff3b5c"/>
+        <rect x="146" y="116" width="24" height="4" fill="#ff7a1a"/>
+        <ellipse cx="160" cy="96" rx="6" ry="7" fill="#ffd25e"/>
+        <ellipse cx="160" cy="80" rx="5" ry="6" fill="#ffd25e" opacity=".7"/>
+      </svg>`
+  }
+];
+
+/* ============================================================
+   渲染
+   ============================================================ */
+const grid = document.getElementById('games');
+const searchInput = document.getElementById('search');
+
+function render(list) {
+  if (!list.length) {
+    grid.innerHTML = '<p class="empty">没有找到匹配的游戏，换个关键词试试。</p>';
+    return;
+  }
+  grid.innerHTML = list.map(g => `
+    <a class="card" href="${g.url}" style="--accent:${g.accent}">
+      <div class="thumb">
+        ${g.badge ? `<span class="badge">${g.badge}</span>` : ''}
+        ${g.preview}
+      </div>
+      <div class="body">
+        <div class="head">
+          <h3>${g.title}</h3>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <p>${g.desc}</p>
+        <div class="tags">${g.tags.map(t => `<span>${t}</span>`).join('')}</div>
+      </div>
+    </a>
+  `).join('');
+}
+
+function filter() {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) return render(GAMES);
+  render(GAMES.filter(g =>
+    g.title.toLowerCase().includes(q) ||
+    g.desc.toLowerCase().includes(q) ||
+    g.tags.some(t => t.toLowerCase().includes(q))
+  ));
+}
+
+searchInput.addEventListener('input', filter);
+render(GAMES);
+
+/* ============================================================
+   自动识别 GitHub 仓库地址（部署在 *.github.io/仓库名/ 时生效）
+   ============================================================ */
+(function detectRepo() {
+  const host = location.hostname;
+  const parts = location.pathname.split('/').filter(Boolean);
+  let repoUrl = '';
+  if (host.endsWith('.github.io') && parts.length >= 1) {
+    const user = host.slice(0, -'.github.io'.length);
+    repoUrl = 'https://github.com/' + user + '/' + parts[0];
+  }
+  if (!repoUrl) return;
+
+  const ghLink = document.getElementById('ghLink');
+  const footerRepo = document.getElementById('footerRepo');
+  ghLink.href = repoUrl;
+  ghLink.hidden = false;
+  footerRepo.href = repoUrl;
+  footerRepo.hidden = false;
+})();
+
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
