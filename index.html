@@ -264,7 +264,7 @@ const GAMES = [
     tags: ['3D', '跑酷', '街机'],
     url: './runner/',
     accent: '#ff4d8d',
-    badge: 'NEW',
+    badge: '',
     preview: `
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
@@ -288,7 +288,67 @@ const GAMES = [
         <ellipse cx="160" cy="96" rx="6" ry="7" fill="#ffd25e"/>
         <ellipse cx="160" cy="80" rx="5" ry="6" fill="#ffd25e" opacity=".7"/>
       </svg>`
-  }
+  },
+  {
+  title: 'РБМК-1000 主控室',
+  desc: '1986 年 4 号机组反应堆操作员席。提插 211 根控制棒、管功率给定、读报警光字牌，在物理模型里看你的每个操作如何演化。',
+  tags: ['模拟', '核工程', '硬核'],
+  url: './rbmk/',
+  accent: '#ff8c3a',
+  badge: '',
+  preview: `
+    <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="rb-glow" cx="50%" cy="50%" r="55%">
+          <stop offset="0" stop-color="#ff8c3a" stop-opacity=".22"/>
+          <stop offset="1" stop-color="#ff8c3a" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="320" height="180" fill="#0d1110"/>
+      <rect width="320" height="180" fill="url(#rb-glow)"/>
+
+      <!-- 顶部光字牌 -->
+      <g>
+        <rect x="18" y="14" width="26" height="14" rx="1" fill="#ff6b4d"/>
+        <rect x="48" y="14" width="26" height="14" rx="1" fill="#cfc8b2"/>
+        <rect x="78" y="14" width="26" height="14" rx="1" fill="#cfc8b2"/>
+        <rect x="108" y="14" width="26" height="14" rx="1" fill="#ffc35a"/>
+        <rect x="138" y="14" width="26" height="14" rx="1" fill="#cfc8b2"/>
+        <rect x="168" y="14" width="26" height="14" rx="1" fill="#fffbe9"/>
+      </g>
+
+      <!-- 左侧仪表 -->
+      <g>
+        <circle cx="62" cy="94" r="32" fill="#1d2220"/>
+        <circle cx="62" cy="94" r="26" fill="#e8e0c8"/>
+        <path d="M42 108 A26 26 0 0 1 82 108" fill="none" stroke="#d6402c" stroke-width="4"/>
+        <line x1="62" y1="94" x2="76" y2="76" stroke="#14181a" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="62" cy="94" r="3" fill="#2a2f2c"/>
+      </g>
+
+      <!-- 堆芯 211 根示意 -->
+      <g>
+        <circle cx="222" cy="94" r="46" fill="#121614"/>
+        <circle cx="222" cy="94" r="42" fill="#1b211d"/>
+        ${Array.from({length: 49}, (_, i) => {
+          const gx = i % 7, gy = Math.floor(i / 7);
+          const dx = gx - 3, dy = gy - 3, d = Math.hypot(dx, dy);
+          if (d > 3.4) return '';
+          const x = 222 + dx * 10.5, y = 94 + dy * 10.5;
+          const col = d < 1 ? '#3d7fd0' : d < 2 ? '#3aa35d' : d < 2.8 ? '#e0b21a' : '#f4efdc';
+          return `<circle cx="${x}" cy="${y}" r="3.6" fill="${col}" opacity=".9"/>`;
+        }).join('')}
+      </g>
+
+      <!-- 数码管 -->
+      <g>
+        <rect x="120" y="146" width="80" height="22" rx="2" fill="#1b1512"/>
+        <text x="160" y="162" text-anchor="middle" font-family="monospace" font-size="14" font-weight="700" fill="#ff8c3a" opacity=".95">0320</text>
+        <text x="206" y="162" font-family="monospace" font-size="8" fill="#c98a5c">MWt</text>
+      </g>
+      <rect x="120" y="146" width="80" height="22" rx="2" fill="none" stroke="#000" stroke-opacity=".4"/>
+    </svg>`
+}
 ];
 
 /* ============================================================
